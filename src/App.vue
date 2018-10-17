@@ -25,6 +25,16 @@
                 <el-col :span="24" class="add_btn">
                   <el-button @click="addLuckyDog" type="primary">Add LUCKY DOG</el-button>
                 </el-col>
+                <el-col :span="24" v-if="lucky_dogs&&lucky_dogs.length">
+                  <el-card class="box-card">
+                    <h3>lucky dogs lists</h3>
+                    <div v-for="(l,i) in lucky_dogs" :key="i" class="text item">
+                      <span>{{l}}</span>
+                      <el-button type="text" size="small" icon="el-icon-delete"  @click="delLuckDog(i)">删除</el-button>
+                    </div>
+                    <el-button type="text" size="small" icon="el-icon-delete"  @click="clearAll">清空</el-button>
+                  </el-card>
+                </el-col>
               </el-row>
             </el-col>
             <el-col :span="12">
@@ -52,6 +62,7 @@
               <el-col :span="16">
                 <el-radio v-model="Mode" label="auto">自动执行</el-radio>
                 <el-radio v-model="Mode" label="hand">手动执行</el-radio>
+                <el-radio v-model="Mode" label="shuffle">随机排序</el-radio>
               </el-col>
           </el-row>
           <hr>
@@ -60,16 +71,26 @@
 
                <el-button @click="Reset" type="danger">Reset</el-button>
           </el-row>
-          <el-row :gutter="20" v-else>
+          <el-row :gutter="20" v-else-if="Mode=='hand'">
             <el-col :span="24">
               <el-button @click="getResult" type="primary" :disabled="Times==clickTime&&clickTime!=0&&Interval">pick</el-button>
                <el-button @click="Reset" type="danger">Reset</el-button>
             </el-col>
           </el-row>
+          <el-row :gutter="20" v-else-if="Mode=='shuffle'">
+            <el-col :span="24">
+              <el-button @click="shuffle" type="primary">shuffle</el-button>
+               <el-button @click="Reset" type="danger">Reset</el-button>
+            </el-col>
+            <el-col>
+                <h3>最新的顺序如下：</h3>
+                <h3 v-for="(r,i) in selected" :key="i">{{i+1}}、{{r.name}}</h3>
+            </el-col>
+          </el-row>
           <hr>
           <el-row v-if='RESULTS.length'>
             <el-col>
-              <h3 v-for="(r,i) in finalResult" :key="i">{{i}}的次数是：{{r.length}}</h3>
+              <h3 v-for="(r,i) in finalResult" :key="i">{{i+1}}的次数是：{{r.length}}</h3>
             </el-col>
             <el-col :span="24">
               <results :results='RESULTS'></results>
@@ -111,6 +132,12 @@ export default {
         this.lucky_dogs.push(this.newLuckDog);
       }
     },
+    delLuckDog:function (i) {
+      this.lucky_dogs.splice(i,1);
+    },
+    clearAll:function () {
+      this.lucky_dogs = [];
+    },
     handleSelected:function (selected,data) {
       console.log(selected,data)
       this.selected=selected;
@@ -141,6 +168,10 @@ export default {
             clearInterval(that.Interval);
           }
         }, 1000);
+    },
+    shuffle:function () {
+     this.selected = _.shuffle(this.selected);
+    //  this.lucky_dogs=_.shuffle(this.lucky_dogs);
     },
     Reset:function () {
       this.Mode='hand';
