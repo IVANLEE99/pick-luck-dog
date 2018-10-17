@@ -6,55 +6,58 @@
         <h1>Who is the lucky dog？</h1>
       </el-header>
       <el-main>
-          <el-row :gutter="20">
+        
+        <div v-show="showsetting">
+            <el-row :gutter="20">
 
-            <el-col :span="12">
-              <el-row :gutter="20">
-                <el-col :span="24" class="info">
-                  <span>
-                    请输入Lucky dog：
-                  </span>
-                </el-col>
-                <el-col :span="24" class="input">
-                    <el-input
-                      placeholder="添加 lucky dog"
-                      v-model="newLuckDog"
-                      clearable>
-                    </el-input>
-                </el-col>
-                <el-col :span="24" class="add_btn">
-                  <el-button @click="addLuckyDog" type="primary">Add LUCKY DOG</el-button>
-                </el-col>
-                <el-col :span="24" v-if="lucky_dogs&&lucky_dogs.length">
-                  <el-card class="box-card">
-                    <h3>lucky dogs lists</h3>
-                    <div v-for="(l,i) in lucky_dogs" :key="i" class="text item">
-                      <span>{{l}}</span>
-                      <el-button type="text" size="small" icon="el-icon-delete"  @click="delLuckDog(i)">删除</el-button>
-                    </div>
-                    <el-button type="text" size="small" icon="el-icon-delete"  @click="clearAll">清空</el-button>
-                  </el-card>
-                </el-col>
-              </el-row>
-            </el-col>
-            <el-col :span="12">
-              <lucky-dogs :luckydogs='lucky_dogs' @selected='handleSelected'></lucky-dogs>
-            </el-col>
-          </el-row>
-          <hr>
-          <el-row :gutter="20">
-              <el-col :span="8">
-                请输入选择次数：
+              <el-col :span="12">
+                <el-row :gutter="20">
+                  <el-col :span="24" class="info">
+                    <span>
+                      请输入Lucky dog：
+                    </span>
+                  </el-col>
+                  <el-col :span="24" class="input">
+                      <el-input
+                        placeholder="添加 lucky dog"
+                        v-model="newLuckDog"
+                        clearable>
+                      </el-input>
+                  </el-col>
+                  <el-col :span="24" class="add_btn">
+                    <el-button @click="addLuckyDog" type="primary">Add LUCKY DOG</el-button>
+                  </el-col>
+                  <el-col :span="24" v-if="lucky_dogs&&lucky_dogs.length">
+                    <el-card class="box-card">
+                      <h3>lucky dogs lists</h3>
+                      <div v-for="(l,i) in lucky_dogs" :key="i" class="text item">
+                        <span>{{l}}</span>
+                        <el-button type="text" size="small" icon="el-icon-delete"  @click="delLuckDog(i)">删除</el-button>
+                      </div>
+                      <el-button type="text" size="small" icon="el-icon-delete"  @click="clearAll">清空</el-button>
+                    </el-card>
+                  </el-col>
+                </el-row>
               </el-col>
-              <el-col :span="16">
-                <el-input
-                  placeholder="请输入次数"
-                  v-model="Times"
-                  clearable>
-                </el-input>
+              <el-col :span="12">
+                <lucky-dogs :luckydogs='lucky_dogs' @selected='handleSelected'></lucky-dogs>
               </el-col>
-          </el-row>
-          <hr>
+            </el-row>
+            <hr>
+            <el-row :gutter="20">
+                <el-col :span="8">
+                  请输入选择次数：
+                </el-col>
+                <el-col :span="16">
+                  <el-input
+                    placeholder="请输入次数"
+                    v-model="Times"
+                    clearable>
+                  </el-input>
+                </el-col>
+            </el-row>
+            <hr>
+        </div>
           <el-row :gutter="20">
               <el-col :span="8">
                 选择模式：
@@ -70,29 +73,32 @@
               <el-button @click="autoGetResult" type="primary" :disabled="Times==clickTime&&clickTime!=0" > auto pick</el-button>
 
                <el-button @click="Reset" type="danger">Reset</el-button>
+               <el-button @click="ToggleSetting" >Toggle setting</el-button>
           </el-row>
           <el-row :gutter="20" v-else-if="Mode=='hand'">
             <el-col :span="24">
               <el-button @click="getResult" type="primary" :disabled="Times==clickTime&&clickTime!=0&&Interval">pick</el-button>
                <el-button @click="Reset" type="danger">Reset</el-button>
+               <el-button @click="ToggleSetting" >Toggle setting</el-button>
             </el-col>
           </el-row>
           <el-row :gutter="20" v-else-if="Mode=='shuffle'">
             <el-col :span="24">
               <el-button @click="shuffle" type="primary">shuffle</el-button>
                <el-button @click="Reset" type="danger">Reset</el-button>
+               <el-button @click="ToggleSetting" >Toggle setting</el-button>
             </el-col>
-            <el-col>
+            <el-col class="sort-result">
                 <h3>最新的顺序如下：</h3>
                 <h3 v-for="(r,i) in selected" :key="i">{{i+1}}、{{r.name}}</h3>
             </el-col>
           </el-row>
           <hr>
           <el-row v-if='RESULTS.length'>
-            <el-col>
+            <el-col class="sort-result">
               <h3 v-for="(r,i) in finalResult" :key="i">{{i+1}}的次数是：{{r.length}}</h3>
             </el-col>
-            <el-col :span="24">
+            <el-col :span="24" class="sort-result">
               <results :results='RESULTS'></results>
             </el-col>
           </el-row>
@@ -124,6 +130,7 @@ export default {
       'clickTime':0,
       newLuckDog:'',
       Interval:'',
+      showsetting:true
     }
   },
   methods:{
@@ -138,6 +145,9 @@ export default {
     clearAll:function () {
       this.lucky_dogs = [];
     },
+    ToggleSetting:function () {
+      this.showsetting=!this.showsetting
+    },
     handleSelected:function (selected,data) {
       console.log(selected,data)
       this.selected=selected;
@@ -147,6 +157,7 @@ export default {
         alert('No lucky dog can be selected!')
         return;
       }
+      this.showsetting=false;
       var index = this.RandomNumBoth(0,this.selected.length-1);
       var r = {
         name:this.selected[index].name,
@@ -160,6 +171,7 @@ export default {
           alert('No lucky dog can be selected!')
           return;
         }
+        this.showsetting=false;
         that.clickTime=0;
         this.Interval = setInterval(function(){
           that.getResult();
@@ -171,6 +183,7 @@ export default {
     },
     shuffle:function () {
      this.selected = _.shuffle(this.selected);
+     this.showsetting = false;
     //  this.lucky_dogs=_.shuffle(this.lucky_dogs);
     },
     Reset:function () {
@@ -182,6 +195,7 @@ export default {
       this.newLuckDog='';
       clearInterval(this.Interval);
       this.Interval='';
+     this.showsetting = true;
     },
     RandomNumBoth:function(Min,Max){
             var Range = Max - Min;
@@ -203,8 +217,9 @@ export default {
       this.clickTime=0;
       this.RESULTS=[];
       var that = this;
-      if (nv=='auto') {
-        
+      if (nv=='shuffle') {
+        that.shuffle();
+        that.showsetting=false;
         // if (!this.selected.length) {
         //   alert('No lucky dog can be selected!')
         //   return;
@@ -250,5 +265,8 @@ export default {
   }
   .el-row .add_btn{
     margin-bottom: 20px;
+  }
+  .sort-result h3{
+    text-align: center;
   }
 </style>

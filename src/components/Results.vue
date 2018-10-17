@@ -1,8 +1,8 @@
 <template>
   <div class="hello">
-      <h2 v-for="(r,i) in results" :key="i">
+      <h3 v-for="(r,i) in results" :key="i">
          {{i+1+':'}} Congratulations, {{r.name}}, You are the Lucky Dog!  {{r.time}}.
-      </h2>
+      </h3>
   </div>
 </template>
 
